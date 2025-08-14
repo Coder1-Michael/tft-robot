@@ -1,0 +1,69 @@
+# ------------------
+# 开发环境 & IDE
+# ------------------
+.idea/          # PyCharm 配置
+.vscode/        # VS Code 配置
+*.swp           # Vim 临时文件
+*.sublime-*     # Sublime Text 配置
+
+# ------------------
+# Python 运行时生成
+# ------------------
+__pycache__/    # 字节码缓存
+*.py[cod]       # 编译文件 (.pyc, .pyo, .pyd)
+*.so            # C 扩展模块
+*.egg-info/     # setuptools 生成的元数据
+dist/           # 打包生成的 dist 目录
+build/          # 构建生成的临时文件
+
+# ------------------
+# 虚拟环境
+# ------------------
+.venv/          # 常见的虚拟环境目录
+venv/
+env/
+ENV/
+bin/            # Linux/Mac 虚拟环境的 bin
+Scripts/        # Windows 虚拟环境的脚本
+Lib/            # Windows 虚拟环境的库
+include/        # 虚拟环境的头文件
+pyvenv.cfg      # 虚拟环境配置文件
+
+# ------------------
+# 测试与覆盖率
+# ------------------
+.coverage       # 覆盖率报告
+htmlcov/        # HTML 覆盖率报告
+.pytest_cache/  # pytest 缓存
+test_output/    # 测试输出文件
+
+# ------------------
+# Jupyter Notebook
+# ------------------
+.ipynb_checkpoints/  # Notebook 自动保存
+*.ipynb_checkpoints 
+
+# ------------------
+# 日志与调试
+# ------------------
+*.log           # 日志文件
+*.tmp           # 临时文件
+*.bak           # 备份文件
+
+# ------------------
+# 依赖管理
+# ------------------
+pip-selfcheck.json  # pip 自检文件
+requirements*.txt   # 动态生成的依赖文件（如 pip freeze 输出）
+constraints.txt     # 可选依赖约束文件
+
+# ------------------
+# 文档生成
+# ------------------
+docs/_build/    # Sphinx 生成的文档
+site/           # MkDocs 生成的站点
+
+# ------------------
+# 
+# 包管理锁文件（按需选择）
+uv.lock
