@@ -13,4 +13,6 @@ dependencies = [
     "mouse==0.7.1",
     "logger>=1.4",
     "numpy<2",
+    "mss>=10.0.0",
+    "pyqt6>=6.9.1",
 ]

@@ -1,40 +1,53 @@
+import os
 import threading
 import time
 import signal
 import sys
-from core.screen_capture import screen_capture
+
+import cv2
+from PIL import ImageGrab
+from cv2.gapi.streaming import timestamp
+
+from core.overlay_window import ResizableDraggableBox, run
+from core.screen_capture import ScreenCapture
 from core.image_recognition import image_recognition
 from core.game_state import game_state
 from core.decision_making import decision_making
 from core.action_execution import action_execution
 from utils.logger import logger
 from config.config import CAPTURE_INTERVAL
+import tkinter as tk
+
 
 class TFTBot:
     def __init__(self):
+        self.capture_thread = None
+        self.draw_thread = None
         self.handle_exit = None
         self.running = False
         self.stop_event = threading.Event()
+        self.debug_mode = True
+        self.bbox = (0, 0, 1920, 1080)  # 设置默认的截图区域
         logger.info("云顶之弈自动对战程序初始化成功")
 
+
     def start(self):
-        """启动程序"""
+        """启动程序（带独立调试窗口线程）"""
         if self.running:
             logger.warning("程序已经在运行中")
             return
 
-        # 加载模型
-        # if not image_recognition.load_model():
-        #     logger.error("模型加载失败，无法启动程序")
-        #     return
-
         self.running = True
         self.stop_event.clear()
-
+        # 启动绘制矩形线程
+        threading.Thread(target=run, args=(self.on_rec_changed,), daemon=True).start()
         # 启动屏幕捕获线程
+        # 确保 bbox 已经被正确更新（可以在这里添加一些调试日志输出）
+        print(f"当前的 bbox: {self.bbox}")  # 添加调试输出，查看 bbox 是否已经正确更新
         self.capture_thread = threading.Thread(
-            target=screen_capture.capture_loop,
-            args=(self.on_screen_captured, self.stop_event)
+            target=lambda: ScreenCapture().capture_loop(self.on_screen_captured, self.stop_event, self.bbox),
+            # 使用lambda来确保传递参数
+            daemon=True
         )
         self.capture_thread.daemon = True
         self.capture_thread.start()
@@ -60,11 +73,53 @@ class TFTBot:
 
     def on_screen_captured(self, frame):
         """屏幕捕获回调函数"""
-        # 分析游戏状态
-        state_data = image_recognition.analyze_game_state(frame)
+        # 使用 frame.shape 获取图像的高度和宽度
+        screenshot_height, screenshot_width = frame.shape[:2]  # 获取 (height, width)
 
-        # 更新游戏状态
-        game_state.update(state_data)
+        # 计算每一小图的宽度（纵向高度保持不变）
+        sub_width = screenshot_width // 5  # 横向切割成五份
+
+        # 切割并保存小图
+        for i in range(5):
+            left = i * sub_width
+            right = (i + 1) * sub_width if i < 4 else screenshot_width  # 最后一块图的右边界
+            # 截取每一块小图，保持原高度
+            sub_image = frame[:, left:right]  # 使用 numpy 切割图像
+            screenshot_dir = r"D:\project\tft-robot\assets\screen_shots"
+            if not os.path.exists(screenshot_dir):
+                os.makedirs(screenshot_dir)
+            timestamp = int(time.time())  # 使用当前时间戳
+            sub_image_path = os.path.join(screenshot_dir, f"screenshot_{timestamp}_{i}.png")
+            # 将 numpy 数组保存为图片
+            if not cv2.imwrite(sub_image_path, sub_image):
+                logger.error(f"截图保存失败：{sub_image_path}")
+            print(f"小图已保存：{sub_image_path}")
+
+    def on_rec_changed(self, x1, y1, x2, y2):
+        """屏幕捕获回调函数"""
+        # 截取方框区域的屏幕截图
+        self.bbox = (x1, y1, x2, y2)
+        print("边框变化=========》",self.bbox)
+        #
+        # # 生成截图文件名，使用当前时间戳避免文件覆盖
+        # timestamp = int(time.time())  # 使用时间戳作为文件名的一部分
+        # screenshot = ImageGrab.grab(bbox)  # 截取方框范围的区域
+        #
+        # # 获取截图的宽度和高度
+        # screenshot_width, screenshot_height = screenshot.size
+        #
+        # # 计算每一小图的宽度（纵向高度保持不变）
+        # sub_width = screenshot_width // 5  # 横向切割成五份
+        #
+        # # 切割并保存小图
+        # for i in range(5):
+        #     left = i * sub_width
+        #     right = (i + 1) * sub_width if i < 4 else screenshot_width  # 最后一块图的右边界
+        #     # 截取每一块小图，保持原高度
+        #     sub_image = screenshot.crop((left, 0, right, screenshot_height))
+        #     sub_image_path = os.path.join(r"D:\project\tft-robot\assets\screen_shots", f"screenshot_{timestamp}_{i}.png")
+        #     sub_image.save(sub_image_path)
+        #     print(f"小图已保存：{sub_image_path}")
 
     def main_loop(self):
         """主循环"""

@@ -11,16 +11,17 @@ class ScreenCapture:
         self.capture_interval = CAPTURE_INTERVAL
         logger.info("屏幕捕获模块初始化成功")
 
-    def capture_screen(self, region=None):
+    def capture_screen(self,bbox, region=None):
         """捕获屏幕画面
         Args:
             region: 捕获区域 (left, top, width, height)
         Returns:
             numpy.ndarray: 捕获的图像
         """
+        print("box================>",bbox)
         try:
             if region is None:
-                region = self.region
+                region = bbox
             screenshot = pyautogui.screenshot(region=region)
             frame = np.array(screenshot)
             frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
@@ -29,7 +30,7 @@ class ScreenCapture:
             logger.error(f"屏幕捕获失败: {str(e)}")
             return None
 
-    def capture_loop(self, callback, stop_event):
+    def capture_loop(self,callback, stop_event,bbox):
         """持续捕获屏幕画面并调用回调函数
         Args:
             callback: 回调函数，接收捕获的图像
@@ -38,7 +39,7 @@ class ScreenCapture:
         logger.info("开始屏幕捕获循环")
         while not stop_event.is_set():
             start_time = time.time()
-            frame = self.capture_screen()
+            frame = self.capture_screen(bbox)
             if frame is not None:
                 callback(frame)
             # 控制捕获频率
