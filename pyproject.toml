@@ -1,0 +1,16 @@
+[project]
+name = "tft-ai"
+version = "0.0.1"
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "opencv-python==4.9.0.80",
+    "pillow==10.2.0",
+    "pyautogui==0.9.54",
+    "pytesseract==0.3.10",
+    "torch==2.2.1",
+    "transformers==4.38.2",
+    "keyboard==0.13.5",
+    "mouse==0.7.1",
+    "logger>=1.4",
+    "numpy<2",
+]
