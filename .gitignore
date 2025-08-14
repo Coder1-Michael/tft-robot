@@ -1,7 +1,7 @@
 # ------------------
 # 开发环境 & IDE
 # ------------------
-.idea/          # PyCharm 配置
+.idea         # PyCharm 配置
 .vscode/        # VS Code 配置
 *.swp           # Vim 临时文件
 *.sublime-*     # Sublime Text 配置
@@ -66,4 +66,5 @@ site/           # MkDocs 生成的站点
 # ------------------
 # 
 # 包管理锁文件（按需选择）
-uv.lock
+uv.lock".idea/" 
+".idea" 
