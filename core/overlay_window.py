@@ -165,7 +165,7 @@ class ResizableDraggableBox:
         return None
 
 
-def run(on_screen_captured):
+def run(draw_finsh):
     root = tk.Tk()
     root.title("透明可拖拽缩放方框")
 
@@ -184,7 +184,7 @@ def run(on_screen_captured):
     root.geometry(f"{screen_width}x{screen_height}+0+0")
 
     # 创建可拖拽和缩放的方框，传入回调函数
-    ResizableDraggableBox(root, on_screen_captured)
+    ResizableDraggableBox(root, draw_finsh)
 
     # 运行主循环
     root.mainloop()
