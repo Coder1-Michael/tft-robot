@@ -100,26 +100,6 @@ class TFTBot:
         # 截取方框区域的屏幕截图
         self.bbox = (x1, y1, x2, y2)
         print("边框变化=========》",self.bbox)
-        #
-        # # 生成截图文件名，使用当前时间戳避免文件覆盖
-        # timestamp = int(time.time())  # 使用时间戳作为文件名的一部分
-        # screenshot = ImageGrab.grab(bbox)  # 截取方框范围的区域
-        #
-        # # 获取截图的宽度和高度
-        # screenshot_width, screenshot_height = screenshot.size
-        #
-        # # 计算每一小图的宽度（纵向高度保持不变）
-        # sub_width = screenshot_width // 5  # 横向切割成五份
-        #
-        # # 切割并保存小图
-        # for i in range(5):
-        #     left = i * sub_width
-        #     right = (i + 1) * sub_width if i < 4 else screenshot_width  # 最后一块图的右边界
-        #     # 截取每一块小图，保持原高度
-        #     sub_image = screenshot.crop((left, 0, right, screenshot_height))
-        #     sub_image_path = os.path.join(r"D:\project\tft-robot\assets\screen_shots", f"screenshot_{timestamp}_{i}.png")
-        #     sub_image.save(sub_image_path)
-        #     print(f"小图已保存：{sub_image_path}")
 
     def main_loop(self):
         """主循环"""
