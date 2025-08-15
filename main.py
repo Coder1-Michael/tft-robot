@@ -5,18 +5,14 @@ import signal
 import sys
 
 import cv2
-from PIL import ImageGrab
-from cv2.gapi.streaming import timestamp
-
 from core.overlay_window import ResizableDraggableBox, run
 from core.screen_capture import ScreenCapture
-from core.image_recognition import image_recognition
-from core.game_state import game_state
 from core.decision_making import decision_making
 from core.action_execution import action_execution
 from utils.logger import logger
 from config.config import CAPTURE_INTERVAL
 import tkinter as tk
+from tkinter import messagebox
 
 
 class TFTBot:
@@ -28,27 +24,33 @@ class TFTBot:
         self.stop_event = threading.Event()
         self.debug_mode = True
         self.bbox = (0, 0, 1920, 1080)  # 设置默认的截图区域
+        self.rec_confirm = False
         logger.info("云顶之弈自动对战程序初始化成功")
 
 
     def start(self):
-        """启动程序（带独立调试窗口线程）"""
         if self.running:
             logger.warning("程序已经在运行中")
             return
 
         self.running = True
         self.stop_event.clear()
+
         # 启动绘制矩形线程
         threading.Thread(target=run, args=(self.on_rec_changed,), daemon=True).start()
-        # 启动屏幕捕获线程
-        # 确保 bbox 已经被正确更新（可以在这里添加一些调试日志输出）
-        print(f"当前的 bbox: {self.bbox}")  # 添加调试输出，查看 bbox 是否已经正确更新
-        self.capture_thread = threading.Thread(
-            target=lambda: ScreenCapture().capture_loop(self.on_screen_captured, self.stop_event, self.bbox),
-            # 使用lambda来确保传递参数
-            daemon=True
-        )
+
+        # 阻塞主线程 等待用户确认商店区域
+        while True:
+            time.sleep(0.5)  # 避免CPU占用过高
+            # 如果确认了商店区域 启动屏幕捕获线程
+            if self.rec_confirm:
+                self.capture_thread = threading.Thread(
+                    target=lambda: ScreenCapture().capture_loop(self.on_screen_captured, self.stop_event, self.bbox),
+                    daemon=True
+                )
+                break
+
+
         self.capture_thread.daemon = True
         self.capture_thread.start()
 
@@ -100,6 +102,19 @@ class TFTBot:
         # 截取方框区域的屏幕截图
         self.bbox = (x1, y1, x2, y2)
         print("边框变化=========》",self.bbox)
+        
+        # 创建确认对话框
+        root = tk.Tk()
+        root.withdraw()  # 隐藏主窗口
+        
+        # 显示确认对话框
+        confirmed = tk.messagebox.askyesno("确认", "是否确认当前选择的商店区域？")
+        if confirmed:
+            print("用户已确认商店区域")
+            return True
+        else:
+            print("用户取消确认，请重新选择")
+            return False
 
     def main_loop(self):
         """主循环"""
