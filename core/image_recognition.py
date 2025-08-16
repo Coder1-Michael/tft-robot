@@ -1,9 +1,13 @@
+import os
+
 import cv2
 import numpy as np
 import pytesseract
 import time
 import requests
-from config.config import CONFIDENCE_THRESHOLD, RECOGNITION_TIMEOUT, GAME_REGION, CHAMPION_SELECT_REGION, ITEM_SELECT_REGION, DIFY_API_KEY, DIFY_API_ENDPOINT
+
+from config import CARD_SELECT_REGION
+from config.config import CONFIDENCE_THRESHOLD, RECOGNITION_TIMEOUT, GAME_REGION, CARD_SELECT_REGION, ITEM_SELECT_REGION, DIFY_API_KEY, DIFY_API_ENDPOINT
 from utils.logger import logger
 
 tesseract_config = r'--oem 3 --psm 6'
@@ -33,24 +37,20 @@ class ImageRecognition:
             logger.error(f"文本识别失败: {str(e)}")
             return ""
 
-    def detect_champions(self, image):
-        """检测图像中的英雄
+    def detect_cards(self, image):
+        """检测图像中的商店中的卡牌
         Args:
             image: 输入图像
         Returns:
-            list: 检测到的英雄列表
+            list: 检测到的卡牌列表
         """
-        if not self.model_loaded:
-            logger.error("模型未加载，无法检测英雄")
-            return []
-
         try:
-            # 提取英雄选择区域
-            x, y, w, h = CHAMPION_SELECT_REGION
-            champion_region = image[y:y+h, x:x+w]
+            # 提取卡牌选择区域
+            x, y, w, h = CARD_SELECT_REGION
+            card_region = image[y:y+h, x:x+w]
 
             # 预处理图像
-            gray = cv2.cvtColor(champion_region, cv2.COLOR_BGR2GRAY)
+            gray = cv2.cvtColor(card_region, cv2.COLOR_BGR2GRAY)
             blurred = cv2.GaussianBlur(gray, (5, 5), 0)
             _, thresh = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
@@ -62,9 +62,9 @@ class ImageRecognition:
                 area = cv2.contourArea(contour)
                 if area > 1000:  # 过滤小轮廓
                     x1, y1, w1, h1 = cv2.boundingRect(contour)
-                    champion_roi = champion_region[y1:y1+h1, x1:x1+w1]
+                    champion_roi = card_region[y1:y1+h1, x1:x1+w1]
 
-                    # 使用OCR识别英雄名称
+                    # 使用OCR识别卡牌名称
                     name = self.recognize_text(champion_roi)
                     if name:
                         champions.append({
@@ -75,7 +75,7 @@ class ImageRecognition:
 
             return champions
         except Exception as e:
-            logger.error(f"英雄检测失败: {str(e)}")
+            logger.error(f"卡牌检测失败: {str(e)}")
             return []
 
     def detect_items(self, image):
@@ -130,25 +130,26 @@ class ImageRecognition:
         Returns:
             dict: 游戏状态信息
         """
-        if not self.model_loaded:
-            logger.error("模型未加载，无法分析游戏状态")
-            return {}
-
         try:
             start_time = time.time()
-
+            # 保存传入的图片到本地以便分析
+            os.makedirs("assets/screen_shots", exist_ok=True)
+            timestamp = int(time.time())
+            screenshot_path = f"assets/screen_shots/screenshot_{timestamp}.png"
+            cv2.imwrite(screenshot_path, image)
+            logger.info(f"游戏截图已保存到: {screenshot_path}")
             # 提取游戏区域
             x, y, w, h = GAME_REGION
             game_region = image[y:y+h, x:x+w]
 
-            # 检测英雄
-            champions = self.detect_champions(image)
+            # 检测卡牌
+            cards = self.detect_cards(image)
 
             # 检测物品
             items = self.detect_items(image)
 
             # 使用Dify API进行更高级的分析
-            prompt = f"分析以下游戏画面信息并提供决策建议:\n检测到的英雄: {[c['name'] for c in champions]}\n检测到的物品: {[i['name'] for i in items]}\n"
+            prompt = f"分析以下游戏画面信息并提供决策建议:\n检测到的卡牌: {[c['name'] for c in cards]}\n检测到的物品: {[i['name'] for i in items]}\n"
             # 这里留出Dify API调用接口，具体实现由用户完成
             analysis = ""  # 用户在此处实现Dify API调用
 
@@ -157,7 +158,7 @@ class ImageRecognition:
                 logger.warning(f"游戏状态分析超时: {elapsed_time:.2f}秒")
 
             return {
-                "champions": champions,
+                "champions": cards,
                 "items": items,
                 "analysis": analysis,
                 "timestamp": time.time()
