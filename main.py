@@ -16,7 +16,6 @@ from utils.logger import logger
 from config.config import CAPTURE_INTERVAL
 import tkinter as tk
 from tkinter import messagebox
-from skimage.metrics import structural_similarity as ssim
 
 class TFTBot:
     def __init__(self):
@@ -191,8 +190,8 @@ class TFTBot:
 
         # 假设回合数区域位于商店区域上方
         # 偏移量可以根据实际情况进行调整，这里设定为商店区域高度的10%
-        round_area_top = (x1, y1 - int(shop_height * 6.2))  # 回合数区域上方
-        round_area_bottom = (x2, y1 - int(shop_height * 6.2) + int(shop_height * 0.2))  # 回合数区域的下边界，假设高度为商店区域的20%
+        round_area_top = (x1, y1 - int(shop_height * 6.45))  # 回合数区域上方
+        round_area_bottom = (x2, y1 - int(shop_height * 6.45) + int(shop_height * 0.3))  # 回合数区域的下边界，假设高度为商店区域的20%
 
         # 打印回合区域的坐标
         logger.info(f"回合数区域坐标: {round_area_top} -> {round_area_bottom}")
