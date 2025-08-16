@@ -13,7 +13,14 @@ dependencies = [
     "mouse==0.7.1",
     "logger>=1.4",
     "numpy<2",
+    "pyside6 (>=6.9.1,<7.0.0)",
     "mss>=10.0.0",
     "pyqt6>=6.9.1",
     "scikit-image",
 ]
+
+[[tool.poetry.source]]
+name = "mirrors"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+priority = "primary"
+

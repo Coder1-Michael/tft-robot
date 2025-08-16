@@ -1,7 +1,8 @@
 # ------------------
 # 开发环境 & IDE
 # ------------------
-.idea         # PyCharm 配置
+.idea/         # PyCharm 配置
+.idea/*
 .vscode/        # VS Code 配置
 *.swp           # Vim 临时文件
 *.sublime-*     # Sublime Text 配置
@@ -10,6 +11,7 @@
 # Python 运行时生成
 # ------------------
 __pycache__/    # 字节码缓存
+__pycache__/*
 *.py[cod]       # 编译文件 (.pyc, .pyo, .pyd)
 *.so            # C 扩展模块
 *.egg-info/     # setuptools 生成的元数据
@@ -68,6 +70,7 @@ site/           # MkDocs 生成的站点
 # 包管理锁文件（按需选择）
 uv.lock
 log/
+*.lock
 .idea/misc.xml
 .idea/tft-robot.iml
 .idea/vcs.xml
@@ -87,3 +90,4 @@ core/__pycache__/image_recognition.cpython-312.pyc
 core/__pycache__/screen_capture.cpython-312.pyc
 config/__pycache__/config.cpython-312.pyc
 config/__pycache__/config.cpython-312.pyc
+poetry.lock
