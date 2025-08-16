@@ -3,9 +3,7 @@ import tkinter as tk
 import threading
 import time
 import queue
-
 from PIL import ImageGrab
-
 
 class ResizableDraggableBox:
     def __init__(self, root, callback):
@@ -22,7 +20,7 @@ class ResizableDraggableBox:
         self.canvas.pack()
 
         # 初始化方框的坐标和大小
-        self.x1, self.y1, self.x2, self.y2 = 200, 150, 400, 350
+        self.x1, self.y1, self.x2, self.y2 = 662, 1294, 1949, 1482
 
         # 创建方框
         self.rect = self.canvas.create_rectangle(self.x1, self.y1, self.x2, self.y2, outline="red", width=2)
@@ -39,6 +37,7 @@ class ResizableDraggableBox:
         # 用于拖动的标志
         self.dragging = False
         self.resizing = None
+        self.last_move_time = time.time()  # 用于控制更新频率
 
         # 绑定鼠标事件
         self.canvas.tag_bind(self.rect, '<ButtonPress-1>', self.on_press_rect)
@@ -62,6 +61,10 @@ class ResizableDraggableBox:
 
     def on_move(self, event):
         if self.dragging:
+            # 限制更新频率，避免过于频繁的绘制
+            if time.time() - self.last_move_time < 1:  # 每50ms更新一次
+                return
+
             dx = event.x - self.drag_start_x
             dy = event.y - self.drag_start_y
 
@@ -77,6 +80,9 @@ class ResizableDraggableBox:
             # 更新坐标
             self.x1, self.y1, self.x2, self.y2 = self.canvas.coords(self.rect)
             self.update_coordinates()
+
+            # 记录最后更新时间
+            self.last_move_time = time.time()
 
     def on_release(self, event):
         self.dragging = False
@@ -119,30 +125,6 @@ class ResizableDraggableBox:
             # 更新坐标
             self.update_coordinates()
 
-    def take_screenshot(self):
-        # 截取方框区域的屏幕截图
-        bbox = (self.x1, self.y1, self.x2, self.y2)
-
-        # 生成截图文件名，使用当前时间戳避免文件覆盖
-        timestamp = int(time.time())  # 使用时间戳作为文件名的一部分
-        screenshot = ImageGrab.grab(bbox)  # 截取方框范围的区域
-
-        # 获取截图的宽度和高度
-        screenshot_width, screenshot_height = screenshot.size
-
-        # 计算每一小图的宽度（纵向高度保持不变）
-        sub_width = screenshot_width // 5  # 横向切割成五份
-
-        # 切割并保存小图
-        for i in range(5):
-            left = i * sub_width
-            right = (i + 1) * sub_width if i < 4 else screenshot_width  # 最后一块图的右边界
-            # 截取每一块小图，保持原高度
-            sub_image = screenshot.crop((left, 0, right, screenshot_height))
-            sub_image_path = os.path.join(self.screenshot_dir, f"screenshot_{timestamp}_{i}.png")
-            sub_image.save(sub_image_path)
-            print(f"小图已保存：{sub_image_path}")
-
     def update_coordinates(self):
         # 每次坐标变化时，调用回调函数
         pass
@@ -164,16 +146,12 @@ class ResizableDraggableBox:
                 return corner
         return None
 
-
 def run(draw_finsh):
     root = tk.Tk()
     root.title("透明可拖拽缩放方框")
 
     # 去掉窗口装饰
     root.overrideredirect(True)
-
-    # 设置透明色为白色背景
-    root.wm_attributes("-transparentcolor", "white")
 
     # 设置窗口总在最前面
     root.wm_attributes("-topmost", 1)
@@ -182,7 +160,7 @@ def run(draw_finsh):
     screen_width = root.winfo_screenwidth()
     screen_height = root.winfo_screenheight()
     root.geometry(f"{screen_width}x{screen_height}+0+0")
-
+    root.wm_attributes("-transparentcolor", "white")  # 试着注释掉这行代码
     # 创建可拖拽和缩放的方框，传入回调函数
     ResizableDraggableBox(root, draw_finsh)
 
