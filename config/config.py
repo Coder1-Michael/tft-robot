@@ -11,7 +11,7 @@ RECOGNITION_TIMEOUT = 5  # 识别超时时间(秒)
 
 # 游戏参数
 GAME_REGION = (200, 100, 1520, 880)  # 游戏区域
-CHAMPION_SELECT_REGION = (500, 300, 920, 480)  # 英雄选择区域
+CARD_SELECT_REGION = (500, 300, 920, 480)  # 卡牌选择区域
 ITEM_SELECT_REGION = (1000, 600, 420, 280)  # 物品选择区域
 
 # 操作参数

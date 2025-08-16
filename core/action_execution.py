@@ -2,7 +2,7 @@ import pyautogui
 import keyboard
 import mouse
 import time
-from config.config import ACTION_DELAY, KEYBOARD_DELAY, MOUSE_DELAY, CHAMPION_SELECT_REGION
+from config.config import ACTION_DELAY, KEYBOARD_DELAY, MOUSE_DELAY, CARD_SELECT_REGION
 from utils.logger import logger
 from core.game_state import game_state
 
