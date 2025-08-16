@@ -17,3 +17,9 @@ dependencies = [
     "pyqt6>=6.9.1",
     "scikit-image",
 ]
+
+[[tool.poetry.source]]
+name = "mirrors"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+priority = "primary"
+

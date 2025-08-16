@@ -87,3 +87,4 @@ core/__pycache__/image_recognition.cpython-312.pyc
 core/__pycache__/screen_capture.cpython-312.pyc
 config/__pycache__/config.cpython-312.pyc
 config/__pycache__/config.cpython-312.pyc
+poetry.lock
