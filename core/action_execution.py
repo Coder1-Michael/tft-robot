@@ -198,7 +198,7 @@ class ActionExecution:
 
             # 升级英雄 (这里简化处理，实际可能需要特定操作)
             if decision["upgrade_champion"]:
-                logger.info(f"升级英雄: {decision["upgrade_champion"]}")
+                logger.info(f"升级英雄: {decision['upgrade_champion']}")
                 # 实际游戏中升级英雄通常需要拥有三个相同英雄，这里假设已经满足条件
                 # 找到英雄并点击
                 for champion in game_state.champions:
